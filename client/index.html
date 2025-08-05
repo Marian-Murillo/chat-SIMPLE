@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MariChat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f2f5;
+    }
+
+    #chat {
+      width: 360px;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #messages {
+      list-style: none;
+      padding: 12px;
+      margin: 0;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .message {
+      padding: 8px 12px;
+      background: #e6f0ff;
+      border-radius: 12px;
+      align-self: flex-start;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    #form {
+      display: flex;
+      padding: 8px;
+      background: #fff;
+      border-top: 1px solid #ddd;
+    }
+
+    #message {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 9999px;
+      outline: none;
+    }
+
+    #form > button {
+      background: #007bff;
+      color: white;
+      border: none;
+      margin-left: 8px;
+      padding: 0 16px;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    #form > button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <section id="chat">
+    <ul id="messages"></ul>
+    <form id="form">
+      <input
+        type="text"
+        id="message"
+        placeholder="Type a message"
+        autocomplete="off"
+      />
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+  <script type="module">
+    import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js';
+
+    const socket = io();
+
+    const form = document.getElementById('form');
+    const input = document.getElementById('message');
+    const messages = document.getElementById('messages');
+
+    // Mostrar los mensajes recibidos
+    socket.on('chat message', (msg) => {
+      const item = document.createElement('li');
+      item.textContent = msg;
+      item.classList.add('message');
+      messages.appendChild(item);
+      messages.scrollTop = messages.scrollHeight;
+    });
+
+    // Enviar mensaje
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit('chat message', input.value);
+        input.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
